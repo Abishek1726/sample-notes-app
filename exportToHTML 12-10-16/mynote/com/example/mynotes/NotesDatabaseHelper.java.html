@@ -1,0 +1,273 @@
+<html>
+<head>
+<title>NotesDatabaseHelper.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: rgb(0,0,0); font-weight: normal; font-style: normal; }
+.s0 { color: rgb(0,0,128); font-weight: bold; }
+.s1 { color: rgb(0,0,0); }
+.s2 { color: rgb(128,128,128); font-style: italic; }
+.s3 { color: rgb(0,0,255); }
+.s4 { color: rgb(0,128,0); font-weight: bold; }
+</style>
+</head>
+<BODY BGCOLOR="#ffffff">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#C0C0C0" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+NotesDatabaseHelper.java</FONT>
+</center></TD></TR></TABLE>
+<pre>
+<a name="l1"><span class="ln">1    </span></a><span class="s0">package </span><span class="s1">mynote.com.example.mynotes; 
+<a name="l2"><span class="ln">2    </span></a> 
+<a name="l3"><span class="ln">3    </span></a></span><span class="s0">import </span><span class="s1">android.content.ContentValues; 
+<a name="l4"><span class="ln">4    </span></a></span><span class="s0">import </span><span class="s1">android.content.Context; 
+<a name="l5"><span class="ln">5    </span></a></span><span class="s0">import </span><span class="s1">android.database.Cursor; 
+<a name="l6"><span class="ln">6    </span></a></span><span class="s0">import </span><span class="s1">android.database.sqlite.SQLiteDatabase; 
+<a name="l7"><span class="ln">7    </span></a></span><span class="s0">import </span><span class="s1">android.database.sqlite.SQLiteOpenHelper; 
+<a name="l8"><span class="ln">8    </span></a></span><span class="s0">import </span><span class="s1">android.util.Log; 
+<a name="l9"><span class="ln">9    </span></a></span><span class="s0">import </span><span class="s1">android.widget.Toast; 
+<a name="l10"><span class="ln">10   </span></a> 
+<a name="l11"><span class="ln">11   </span></a></span><span class="s0">import </span><span class="s1">java.util.ArrayList; 
+<a name="l12"><span class="ln">12   </span></a></span><span class="s0">import </span><span class="s1">java.util.HashMap; 
+<a name="l13"><span class="ln">13   </span></a></span><span class="s0">import </span><span class="s1">java.util.Iterator; 
+<a name="l14"><span class="ln">14   </span></a></span><span class="s0">import </span><span class="s1">java.util.List; 
+<a name="l15"><span class="ln">15   </span></a></span><span class="s0">import </span><span class="s1">java.util.Map; 
+<a name="l16"><span class="ln">16   </span></a></span><span class="s0">import </span><span class="s1">java.util.Set; 
+<a name="l17"><span class="ln">17   </span></a> 
+<a name="l18"><span class="ln">18   </span></a></span><span class="s2">/** 
+<a name="l19"><span class="ln">19   </span></a> * Created by Abi on 9/16/2016. 
+<a name="l20"><span class="ln">20   </span></a> */</span><span class="s1"> 
+<a name="l21"><span class="ln">21   </span></a></span><span class="s0">public class </span><span class="s1">NotesDatabaseHelper </span><span class="s0">extends </span><span class="s1">SQLiteOpenHelper { 
+<a name="l22"><span class="ln">22   </span></a> 
+<a name="l23"><span class="ln">23   </span></a>    </span><span class="s0">public static final int </span><span class="s1">DATABASE_VERSION = </span><span class="s3">2</span><span class="s1">; 
+<a name="l24"><span class="ln">24   </span></a>    </span><span class="s0">public static final </span><span class="s1">String DATABASE_NAME = </span><span class="s4">&quot;NotesDB&quot;</span><span class="s1">; 
+<a name="l25"><span class="ln">25   </span></a>    </span><span class="s0">static </span><span class="s1">Context context; 
+<a name="l26"><span class="ln">26   </span></a>    </span><span class="s0">private static boolean </span><span class="s1">contextSet = </span><span class="s0">false</span><span class="s1">; 
+<a name="l27"><span class="ln">27   </span></a>    </span><span class="s0">private static </span><span class="s1">NotesDatabaseHelper notesDatabaseHelper = </span><span class="s0">null</span><span class="s1">; 
+<a name="l28"><span class="ln">28   </span></a> 
+<a name="l29"><span class="ln">29   </span></a>    </span><span class="s0">public static boolean </span><span class="s1">isContextSet() 
+<a name="l30"><span class="ln">30   </span></a>    { </span><span class="s0">return </span><span class="s1">contextSet; } 
+<a name="l31"><span class="ln">31   </span></a> 
+<a name="l32"><span class="ln">32   </span></a>    </span><span class="s0">public static void </span><span class="s1">setContext(Context context) 
+<a name="l33"><span class="ln">33   </span></a>    { 
+<a name="l34"><span class="ln">34   </span></a>        NotesDatabaseHelper.context = context; 
+<a name="l35"><span class="ln">35   </span></a>    } 
+<a name="l36"><span class="ln">36   </span></a> 
+<a name="l37"><span class="ln">37   </span></a>    </span><span class="s0">public static </span><span class="s1">NotesDatabaseHelper getInstance() 
+<a name="l38"><span class="ln">38   </span></a>    { 
+<a name="l39"><span class="ln">39   </span></a>        </span><span class="s0">if</span><span class="s1">(notesDatabaseHelper != </span><span class="s0">null</span><span class="s1">) 
+<a name="l40"><span class="ln">40   </span></a>            </span><span class="s0">return </span><span class="s1">notesDatabaseHelper; 
+<a name="l41"><span class="ln">41   </span></a> 
+<a name="l42"><span class="ln">42   </span></a>        </span><span class="s0">if</span><span class="s1">(context == </span><span class="s0">null</span><span class="s1">) 
+<a name="l43"><span class="ln">43   </span></a>        </span><span class="s0">throw new </span><span class="s1">NullPointerException(</span><span class="s4">&quot;NullPointerException : Context is null - set context in NotesDatabaseHelper before creating Singleton instance&quot;</span><span class="s1">); 
+<a name="l44"><span class="ln">44   </span></a> 
+<a name="l45"><span class="ln">45   </span></a>        notesDatabaseHelper = </span><span class="s0">new </span><span class="s1">NotesDatabaseHelper(context); 
+<a name="l46"><span class="ln">46   </span></a>        </span><span class="s0">return </span><span class="s1">notesDatabaseHelper; 
+<a name="l47"><span class="ln">47   </span></a>    } 
+<a name="l48"><span class="ln">48   </span></a> 
+<a name="l49"><span class="ln">49   </span></a>    </span><span class="s0">private </span><span class="s1">NotesDatabaseHelper(Context context) { 
+<a name="l50"><span class="ln">50   </span></a>        </span><span class="s0">super</span><span class="s1">(context, DATABASE_NAME, </span><span class="s0">null</span><span class="s1">, DATABASE_VERSION); 
+<a name="l51"><span class="ln">51   </span></a>        </span><span class="s0">this</span><span class="s1">.context = context; 
+<a name="l52"><span class="ln">52   </span></a>    } 
+<a name="l53"><span class="ln">53   </span></a> 
+<a name="l54"><span class="ln">54   </span></a>    @Override 
+<a name="l55"><span class="ln">55   </span></a>    </span><span class="s0">public void </span><span class="s1">onCreate(SQLiteDatabase db) { 
+<a name="l56"><span class="ln">56   </span></a>        db.execSQL(NotesTable.CREATE_NOTES_TABLE); 
+<a name="l57"><span class="ln">57   </span></a>    } 
+<a name="l58"><span class="ln">58   </span></a> 
+<a name="l59"><span class="ln">59   </span></a>    @Override 
+<a name="l60"><span class="ln">60   </span></a>    </span><span class="s0">public void </span><span class="s1">onUpgrade(SQLiteDatabase db, </span><span class="s0">int </span><span class="s1">oldVersion, </span><span class="s0">int </span><span class="s1">newVersion) { 
+<a name="l61"><span class="ln">61   </span></a>            db.execSQL(CheckNotesTable.CREATE_CHECK_NOTES_TABLE); 
+<a name="l62"><span class="ln">62   </span></a>            db.execSQL(CheckItemTable.CREATE_CHECK_ITEM_TABLE); 
+<a name="l63"><span class="ln">63   </span></a>    } 
+<a name="l64"><span class="ln">64   </span></a> 
+<a name="l65"><span class="ln">65   </span></a>    </span><span class="s0">public void </span><span class="s1">deleteNote(</span><span class="s0">int </span><span class="s1">id) { 
+<a name="l66"><span class="ln">66   </span></a>        </span><span class="s0">try </span><span class="s1">{ 
+<a name="l67"><span class="ln">67   </span></a>            getWritableDatabase().delete(NotesTable.TABLE_NAME, NotesTable.COLUMN_PRIMARY + </span><span class="s4">&quot; = &quot; </span><span class="s1">+ String.valueOf(id), </span><span class="s0">null</span><span class="s1">); 
+<a name="l68"><span class="ln">68   </span></a>        } 
+<a name="l69"><span class="ln">69   </span></a>        </span><span class="s0">catch </span><span class="s1">(Exception e) 
+<a name="l70"><span class="ln">70   </span></a>        { 
+<a name="l71"><span class="ln">71   </span></a> 
+<a name="l72"><span class="ln">72   </span></a>        } 
+<a name="l73"><span class="ln">73   </span></a>        getWritableDatabase().close(); 
+<a name="l74"><span class="ln">74   </span></a>    } 
+<a name="l75"><span class="ln">75   </span></a> 
+<a name="l76"><span class="ln">76   </span></a>    </span><span class="s0">public class </span><span class="s1">NotesTable { 
+<a name="l77"><span class="ln">77   </span></a>        </span><span class="s0">public final static </span><span class="s1">String TABLE_NAME = </span><span class="s4">&quot;NOTES&quot;</span><span class="s1">; 
+<a name="l78"><span class="ln">78   </span></a>        </span><span class="s0">public final static </span><span class="s1">String COLUMN_TITLE = </span><span class="s4">&quot;TITLE&quot;</span><span class="s1">; 
+<a name="l79"><span class="ln">79   </span></a>        </span><span class="s0">public final static </span><span class="s1">String COLUMN_TEXT = </span><span class="s4">&quot;NOTES_TEXT&quot;</span><span class="s1">; 
+<a name="l80"><span class="ln">80   </span></a>        </span><span class="s0">public final static </span><span class="s1">String COLUMN_PRIMARY = </span><span class="s4">&quot;_id&quot;</span><span class="s1">; 
+<a name="l81"><span class="ln">81   </span></a>        </span><span class="s0">public final static </span><span class="s1">String CREATE_NOTES_TABLE = </span><span class="s4">&quot;CREATE TABLE &quot; </span><span class="s1">+ TABLE_NAME + </span><span class="s4">&quot;(&quot; </span><span class="s1">+ COLUMN_TITLE + </span><span class="s4">&quot; TEXT, &quot; </span><span class="s1">+ COLUMN_TEXT 
+<a name="l82"><span class="ln">82   </span></a>                + </span><span class="s4">&quot; TEXT, &quot; </span><span class="s1">+ COLUMN_PRIMARY + </span><span class="s4">&quot; INTEGER PRIMARY KEY AUTOINCREMENT);&quot;</span><span class="s1">; 
+<a name="l83"><span class="ln">83   </span></a> 
+<a name="l84"><span class="ln">84   </span></a> 
+<a name="l85"><span class="ln">85   </span></a>    } 
+<a name="l86"><span class="ln">86   </span></a> 
+<a name="l87"><span class="ln">87   </span></a>    </span><span class="s0">public class </span><span class="s1">CheckNotesTable 
+<a name="l88"><span class="ln">88   </span></a>    { 
+<a name="l89"><span class="ln">89   </span></a>        </span><span class="s0">public final static </span><span class="s1">String TABLE_NAME = </span><span class="s4">&quot;CHECK_NOTES&quot;</span><span class="s1">; 
+<a name="l90"><span class="ln">90   </span></a>        </span><span class="s0">public final static </span><span class="s1">String COLUMN_TITLE = </span><span class="s4">&quot;TITLE&quot;</span><span class="s1">; 
+<a name="l91"><span class="ln">91   </span></a>        </span><span class="s0">public final static </span><span class="s1">String COLUMN_PRIMARY = </span><span class="s4">&quot;_id&quot;</span><span class="s1">; 
+<a name="l92"><span class="ln">92   </span></a>        </span><span class="s0">public final static </span><span class="s1">String CREATE_CHECK_NOTES_TABLE = </span><span class="s4">&quot;CREATE TABLE &quot;</span><span class="s1">+TABLE_NAME+ </span><span class="s4">&quot;(&quot;</span><span class="s1">+COLUMN_TITLE+</span><span class="s4">&quot; TEXT, &quot;</span><span class="s1">+COLUMN_PRIMARY+ 
+<a name="l93"><span class="ln">93   </span></a>                </span><span class="s4">&quot; INTEGER PRIMARY KEY AUTOINCREMENT); &quot;</span><span class="s1">; 
+<a name="l94"><span class="ln">94   </span></a> 
+<a name="l95"><span class="ln">95   </span></a>    } 
+<a name="l96"><span class="ln">96   </span></a> 
+<a name="l97"><span class="ln">97   </span></a>    </span><span class="s0">public class </span><span class="s1">CheckItemTable 
+<a name="l98"><span class="ln">98   </span></a>    { 
+<a name="l99"><span class="ln">99   </span></a>        </span><span class="s0">public final static </span><span class="s1">String TABLE_NAME = </span><span class="s4">&quot;CHECK_ITEM&quot;</span><span class="s1">; 
+<a name="l100"><span class="ln">100  </span></a>        </span><span class="s0">public final static </span><span class="s1">String COLUMN_CHECK_NOTES_ID_FOREIGN = </span><span class="s4">&quot;cn_id&quot;</span><span class="s1">; 
+<a name="l101"><span class="ln">101  </span></a>        </span><span class="s0">public final static </span><span class="s1">String COLUMN_PRIMARY = </span><span class="s4">&quot;_id&quot;</span><span class="s1">; 
+<a name="l102"><span class="ln">102  </span></a>        </span><span class="s0">public final static </span><span class="s1">String COLUMN_TEXT = </span><span class="s4">&quot;CHECK_NOTES_TEXT&quot;</span><span class="s1">; 
+<a name="l103"><span class="ln">103  </span></a>        </span><span class="s0">public final static </span><span class="s1">String COLUMN_CHECKED = </span><span class="s4">&quot;IS_CHECKED&quot;</span><span class="s1">; 
+<a name="l104"><span class="ln">104  </span></a>        </span><span class="s0">public static final </span><span class="s1">String CREATE_CHECK_ITEM_TABLE = </span><span class="s4">&quot;CREATE TABLE &quot;</span><span class="s1">+TABLE_NAME+</span><span class="s4">&quot;(&quot;</span><span class="s1">+COLUMN_TEXT+</span><span class="s4">&quot; TEXT, &quot;</span><span class="s1">+COLUMN_PRIMARY+ 
+<a name="l105"><span class="ln">105  </span></a>                </span><span class="s4">&quot; INTEGER PRIMARY KEY AUTOINCREMENT, &quot;</span><span class="s1">+ COLUMN_CHECK_NOTES_ID_FOREIGN+</span><span class="s4">&quot; INTEGER, &quot;</span><span class="s1">+COLUMN_CHECKED+</span><span class="s4">&quot; INTEGER, &quot;</span><span class="s1">+</span><span class="s4">&quot; FOREIGN KEY(&quot;</span><span class="s1">+COLUMN_CHECK_NOTES_ID_FOREIGN+</span><span class="s4">&quot;)&quot;</span><span class="s1">+ 
+<a name="l106"><span class="ln">106  </span></a>                </span><span class="s4">&quot; REFERENCES &quot;</span><span class="s1">+CheckNotesTable.TABLE_NAME+</span><span class="s4">&quot;(&quot;</span><span class="s1">+CheckNotesTable.COLUMN_PRIMARY+</span><span class="s4">&quot; )  );&quot;</span><span class="s1">; 
+<a name="l107"><span class="ln">107  </span></a>    } 
+<a name="l108"><span class="ln">108  </span></a> 
+<a name="l109"><span class="ln">109  </span></a>    </span><span class="s0">public void </span><span class="s1">insertCheckNote(<a href="CheckNote.java.html">CheckNote</a> checkNote) 
+<a name="l110"><span class="ln">110  </span></a>    { 
+<a name="l111"><span class="ln">111  </span></a>        ContentValues checkNoteValues = </span><span class="s0">new </span><span class="s1">ContentValues(); 
+<a name="l112"><span class="ln">112  </span></a> 
+<a name="l113"><span class="ln">113  </span></a>        checkNoteValues.put(CheckNotesTable.COLUMN_TITLE,checkNote.getTitle()); 
+<a name="l114"><span class="ln">114  </span></a> 
+<a name="l115"><span class="ln">115  </span></a>        </span><span class="s0">long </span><span class="s1">id = getWritableDatabase().insert(CheckNotesTable.TABLE_NAME,</span><span class="s0">null</span><span class="s1">,checkNoteValues); 
+<a name="l116"><span class="ln">116  </span></a> 
+<a name="l117"><span class="ln">117  </span></a>        Set&lt;Map.Entry&lt;String,Boolean&gt;&gt; set = checkNote.getCheckNoteMap().entrySet(); 
+<a name="l118"><span class="ln">118  </span></a> 
+<a name="l119"><span class="ln">119  </span></a>        Iterator&lt;Map.Entry&lt;String,Boolean&gt;&gt; iterator = set.iterator(); 
+<a name="l120"><span class="ln">120  </span></a> 
+<a name="l121"><span class="ln">121  </span></a>        </span><span class="s0">while </span><span class="s1">(iterator.hasNext()) 
+<a name="l122"><span class="ln">122  </span></a>        { 
+<a name="l123"><span class="ln">123  </span></a>            ContentValues checkItemValues = </span><span class="s0">new </span><span class="s1">ContentValues(); 
+<a name="l124"><span class="ln">124  </span></a> 
+<a name="l125"><span class="ln">125  </span></a>            Map.Entry&lt;String,Boolean&gt; entry = iterator.next(); 
+<a name="l126"><span class="ln">126  </span></a> 
+<a name="l127"><span class="ln">127  </span></a>            checkItemValues.put(CheckItemTable.COLUMN_TEXT,entry.getKey()); 
+<a name="l128"><span class="ln">128  </span></a> 
+<a name="l129"><span class="ln">129  </span></a>            </span><span class="s0">int </span><span class="s1">checkFlag = (entry.getValue())?</span><span class="s3">1</span><span class="s1">:</span><span class="s3">0</span><span class="s1">; 
+<a name="l130"><span class="ln">130  </span></a> 
+<a name="l131"><span class="ln">131  </span></a>            checkItemValues.put(CheckItemTable.COLUMN_CHECKED,checkFlag); 
+<a name="l132"><span class="ln">132  </span></a>            checkItemValues.put(CheckItemTable.COLUMN_CHECK_NOTES_ID_FOREIGN,id); 
+<a name="l133"><span class="ln">133  </span></a> 
+<a name="l134"><span class="ln">134  </span></a>            getWritableDatabase().insert(CheckItemTable.TABLE_NAME,</span><span class="s0">null</span><span class="s1">,checkItemValues); 
+<a name="l135"><span class="ln">135  </span></a>        } 
+<a name="l136"><span class="ln">136  </span></a> 
+<a name="l137"><span class="ln">137  </span></a>        getWritableDatabase().close(); 
+<a name="l138"><span class="ln">138  </span></a> 
+<a name="l139"><span class="ln">139  </span></a>    } 
+<a name="l140"><span class="ln">140  </span></a> 
+<a name="l141"><span class="ln">141  </span></a>    </span><span class="s0">public </span><span class="s1">List&lt;CheckNote&gt; getCheckNoteList() 
+<a name="l142"><span class="ln">142  </span></a>    { 
+<a name="l143"><span class="ln">143  </span></a>        List&lt;CheckNote&gt; list = </span><span class="s0">new </span><span class="s1">ArrayList&lt;&gt;(); 
+<a name="l144"><span class="ln">144  </span></a> 
+<a name="l145"><span class="ln">145  </span></a>        Cursor c = getWritableDatabase().query(CheckNotesTable.TABLE_NAME,</span><span class="s0">null</span><span class="s1">,</span><span class="s0">null</span><span class="s1">,</span><span class="s0">null</span><span class="s1">,</span><span class="s0">null</span><span class="s1">,</span><span class="s0">null</span><span class="s1">,</span><span class="s0">null</span><span class="s1">); 
+<a name="l146"><span class="ln">146  </span></a> 
+<a name="l147"><span class="ln">147  </span></a>        String query = </span><span class="s4">&quot;SELECT *FROM &quot;</span><span class="s1">+CheckItemTable.TABLE_NAME+</span><span class="s4">&quot; INNER JOIN &quot;</span><span class="s1">+CheckNotesTable.TABLE_NAME+</span><span class="s4">&quot; ON &quot;</span><span class="s1">+ 
+<a name="l148"><span class="ln">148  </span></a>                CheckItemTable.TABLE_NAME+</span><span class="s4">&quot;.&quot;</span><span class="s1">+CheckItemTable.COLUMN_CHECK_NOTES_ID_FOREIGN+</span><span class="s4">&quot; = &quot;</span><span class="s1">+ 
+<a name="l149"><span class="ln">149  </span></a>                CheckNotesTable.TABLE_NAME+</span><span class="s4">&quot;.&quot;</span><span class="s1">+CheckNotesTable.COLUMN_PRIMARY+</span><span class="s4">&quot; WHERE &quot;</span><span class="s1">+CheckNotesTable.COLUMN_PRIMARY+</span><span class="s4">&quot; = ? ;&quot;</span><span class="s1">; 
+<a name="l150"><span class="ln">150  </span></a> 
+<a name="l151"><span class="ln">151  </span></a>        </span><span class="s0">if</span><span class="s1">(c.moveToFirst()) 
+<a name="l152"><span class="ln">152  </span></a>        </span><span class="s0">while </span><span class="s1">(!c.isAfterLast()) 
+<a name="l153"><span class="ln">153  </span></a>        { 
+<a name="l154"><span class="ln">154  </span></a>            String title = c.getString(c.getColumnIndex(CheckNotesTable.COLUMN_TITLE)); 
+<a name="l155"><span class="ln">155  </span></a>            </span><span class="s0">long </span><span class="s1">id = c.getLong(c.getColumnIndex(CheckNotesTable.COLUMN_PRIMARY)); 
+<a name="l156"><span class="ln">156  </span></a> 
+<a name="l157"><span class="ln">157  </span></a>            Cursor c2 = getWritableDatabase().rawQuery(query,</span><span class="s0">new </span><span class="s1">String[]{String.valueOf(id)}); 
+<a name="l158"><span class="ln">158  </span></a> 
+<a name="l159"><span class="ln">159  </span></a>            Map&lt;String,Boolean&gt; map = </span><span class="s0">new </span><span class="s1">HashMap&lt;&gt;(); 
+<a name="l160"><span class="ln">160  </span></a> 
+<a name="l161"><span class="ln">161  </span></a>            </span><span class="s0">if</span><span class="s1">(c2.moveToFirst()) 
+<a name="l162"><span class="ln">162  </span></a>                </span><span class="s0">while</span><span class="s1">(!c2.isAfterLast()) 
+<a name="l163"><span class="ln">163  </span></a>                { 
+<a name="l164"><span class="ln">164  </span></a>                    String key = c2.getString(c2.getColumnIndex(CheckItemTable.COLUMN_TEXT)); 
+<a name="l165"><span class="ln">165  </span></a>                    </span><span class="s0">int </span><span class="s1">v = c2.getInt(c2.getColumnIndex(CheckItemTable.COLUMN_CHECKED)); 
+<a name="l166"><span class="ln">166  </span></a>                    </span><span class="s0">boolean </span><span class="s1">val = (v==</span><span class="s3">1</span><span class="s1">)?</span><span class="s0">true</span><span class="s1">:</span><span class="s0">false</span><span class="s1">; 
+<a name="l167"><span class="ln">167  </span></a> 
+<a name="l168"><span class="ln">168  </span></a>                    map.put(key,val); 
+<a name="l169"><span class="ln">169  </span></a> 
+<a name="l170"><span class="ln">170  </span></a>                    c2.moveToNext(); 
+<a name="l171"><span class="ln">171  </span></a>                } 
+<a name="l172"><span class="ln">172  </span></a> 
+<a name="l173"><span class="ln">173  </span></a>            list.add(</span><span class="s0">new <a href="CheckNote.java.html">CheckNote</a></span><span class="s1">(title,map)); 
+<a name="l174"><span class="ln">174  </span></a> 
+<a name="l175"><span class="ln">175  </span></a>            c.moveToNext(); 
+<a name="l176"><span class="ln">176  </span></a>        } 
+<a name="l177"><span class="ln">177  </span></a> 
+<a name="l178"><span class="ln">178  </span></a>        getWritableDatabase().close(); 
+<a name="l179"><span class="ln">179  </span></a> 
+<a name="l180"><span class="ln">180  </span></a>        </span><span class="s0">return </span><span class="s1">list; 
+<a name="l181"><span class="ln">181  </span></a>    } 
+<a name="l182"><span class="ln">182  </span></a> 
+<a name="l183"><span class="ln">183  </span></a> 
+<a name="l184"><span class="ln">184  </span></a>    </span><span class="s0">public void </span><span class="s1">insertNote(<a href="Note.java.html">Note</a> note) { 
+<a name="l185"><span class="ln">185  </span></a> 
+<a name="l186"><span class="ln">186  </span></a>        ContentValues values = </span><span class="s0">new </span><span class="s1">ContentValues(); 
+<a name="l187"><span class="ln">187  </span></a> 
+<a name="l188"><span class="ln">188  </span></a>        values.put(NotesTable.COLUMN_TITLE, note.getTitle()); 
+<a name="l189"><span class="ln">189  </span></a>        values.put(NotesTable.COLUMN_TEXT, note.getText()); 
+<a name="l190"><span class="ln">190  </span></a>        </span><span class="s0">try </span><span class="s1">{ 
+<a name="l191"><span class="ln">191  </span></a>            getWritableDatabase().insert(NotesTable.TABLE_NAME, </span><span class="s0">null</span><span class="s1">, values); 
+<a name="l192"><span class="ln">192  </span></a>            Toast.makeText(context, </span><span class="s4">&quot;Saved successfully&quot;</span><span class="s1">, Toast.LENGTH_LONG).show(); 
+<a name="l193"><span class="ln">193  </span></a>        } </span><span class="s0">catch </span><span class="s1">(Exception e) { 
+<a name="l194"><span class="ln">194  </span></a>            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show(); 
+<a name="l195"><span class="ln">195  </span></a>        } 
+<a name="l196"><span class="ln">196  </span></a>        getWritableDatabase().close(); 
+<a name="l197"><span class="ln">197  </span></a>    } 
+<a name="l198"><span class="ln">198  </span></a>    </span><span class="s0">public void </span><span class="s1">updateNote(<a href="Note.java.html">Note</a> note) 
+<a name="l199"><span class="ln">199  </span></a>    { 
+<a name="l200"><span class="ln">200  </span></a>        ContentValues values = </span><span class="s0">new </span><span class="s1">ContentValues(); 
+<a name="l201"><span class="ln">201  </span></a> 
+<a name="l202"><span class="ln">202  </span></a> 
+<a name="l203"><span class="ln">203  </span></a>        values.put(NotesTable.COLUMN_TITLE, note.getTitle()); 
+<a name="l204"><span class="ln">204  </span></a>        values.put(NotesTable.COLUMN_TEXT, note.getText()); 
+<a name="l205"><span class="ln">205  </span></a>        </span><span class="s0">try </span><span class="s1">{ 
+<a name="l206"><span class="ln">206  </span></a>            String whereClause = NotesTable.COLUMN_PRIMARY+ </span><span class="s4">&quot; = &quot; </span><span class="s1">+ String.valueOf(note.getID()); 
+<a name="l207"><span class="ln">207  </span></a>            getWritableDatabase().update(NotesTable.TABLE_NAME,values,whereClause,</span><span class="s0">null</span><span class="s1">); 
+<a name="l208"><span class="ln">208  </span></a> 
+<a name="l209"><span class="ln">209  </span></a>            Toast.makeText(context, </span><span class="s4">&quot;Saved successfully&quot;</span><span class="s1">, Toast.LENGTH_LONG).show(); 
+<a name="l210"><span class="ln">210  </span></a>        } </span><span class="s0">catch </span><span class="s1">(Exception e) { 
+<a name="l211"><span class="ln">211  </span></a>            Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show(); 
+<a name="l212"><span class="ln">212  </span></a>            Log.d(</span><span class="s4">&quot;sql exception&quot;</span><span class="s1">,e.toString()); 
+<a name="l213"><span class="ln">213  </span></a>        } 
+<a name="l214"><span class="ln">214  </span></a>        getWritableDatabase().close(); 
+<a name="l215"><span class="ln">215  </span></a>    } 
+<a name="l216"><span class="ln">216  </span></a> 
+<a name="l217"><span class="ln">217  </span></a>    </span><span class="s0">public </span><span class="s1">List&lt;Note&gt; getAllNotes() { 
+<a name="l218"><span class="ln">218  </span></a>        List&lt;Note&gt; noteList = </span><span class="s0">new </span><span class="s1">ArrayList&lt;Note&gt;(); 
+<a name="l219"><span class="ln">219  </span></a> 
+<a name="l220"><span class="ln">220  </span></a>        </span><span class="s0">try </span><span class="s1">{ 
+<a name="l221"><span class="ln">221  </span></a>            Cursor c = getReadableDatabase().query(NotesTable.TABLE_NAME, </span><span class="s0">null</span><span class="s1">, </span><span class="s0">null</span><span class="s1">, </span><span class="s0">null</span><span class="s1">, </span><span class="s0">null</span><span class="s1">, </span><span class="s0">null</span><span class="s1">, </span><span class="s0">null</span><span class="s1">); 
+<a name="l222"><span class="ln">222  </span></a> 
+<a name="l223"><span class="ln">223  </span></a>            </span><span class="s0">if </span><span class="s1">(c.moveToFirst()) { 
+<a name="l224"><span class="ln">224  </span></a>                </span><span class="s0">while </span><span class="s1">(!c.isAfterLast()) { 
+<a name="l225"><span class="ln">225  </span></a>                    </span><span class="s0">int </span><span class="s1">i = c.getColumnIndex(NotesTable.COLUMN_TITLE); 
+<a name="l226"><span class="ln">226  </span></a>                    String title = c.getString(i); 
+<a name="l227"><span class="ln">227  </span></a>                    i = c.getColumnIndex(NotesTable.COLUMN_TEXT); 
+<a name="l228"><span class="ln">228  </span></a>                    String text = c.getString(i); 
+<a name="l229"><span class="ln">229  </span></a>                    i = c.getColumnIndex(NotesTable.COLUMN_PRIMARY); 
+<a name="l230"><span class="ln">230  </span></a>                    </span><span class="s0">int </span><span class="s1">id = c.getInt(i); 
+<a name="l231"><span class="ln">231  </span></a> 
+<a name="l232"><span class="ln">232  </span></a>                    <a href="Note.java.html">Note</a> note = </span><span class="s0">new <a href="Note.java.html">Note</a></span><span class="s1">(title, text); 
+<a name="l233"><span class="ln">233  </span></a>                    note.setID(id); 
+<a name="l234"><span class="ln">234  </span></a> 
+<a name="l235"><span class="ln">235  </span></a>                    noteList.add(note); 
+<a name="l236"><span class="ln">236  </span></a> 
+<a name="l237"><span class="ln">237  </span></a>                    c.moveToNext(); 
+<a name="l238"><span class="ln">238  </span></a>                } 
+<a name="l239"><span class="ln">239  </span></a>            } 
+<a name="l240"><span class="ln">240  </span></a> 
+<a name="l241"><span class="ln">241  </span></a>        } </span><span class="s0">catch </span><span class="s1">(Exception e) { 
+<a name="l242"><span class="ln">242  </span></a> 
+<a name="l243"><span class="ln">243  </span></a>            Toast.makeText(context,</span><span class="s4">&quot;SQL error&quot;</span><span class="s1">,Toast.LENGTH_LONG).show(); 
+<a name="l244"><span class="ln">244  </span></a>        } 
+<a name="l245"><span class="ln">245  </span></a> 
+<a name="l246"><span class="ln">246  </span></a>        getWritableDatabase().close(); 
+<a name="l247"><span class="ln">247  </span></a>        </span><span class="s0">return </span><span class="s1">noteList; 
+<a name="l248"><span class="ln">248  </span></a>    } 
+<a name="l249"><span class="ln">249  </span></a> 
+<a name="l250"><span class="ln">250  </span></a>} 
+<a name="l251"><span class="ln">251  </span></a></span></pre>
+</body>
+</html>

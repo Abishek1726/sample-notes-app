@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">My Notes</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <array name="main_list">
+        <item>All</item>
+        <item>Notes</item>
+        <item>Check list</item>
+        <item>Favourites</item>
+    </array>
+
+</resources>
